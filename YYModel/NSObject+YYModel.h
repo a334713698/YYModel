@@ -42,10 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
      @end
     
      int main() {
-         // create model from json
+         // json转模型
          YYBook *book = [YYBook yy_modelWithJSON:@"{\"name\": \"Harry Potter\", \"pages\": 256, \"author\": {\"name\": \"J.K.Rowling\", \"birthday\": \"1965-07-31\" }}"];
  
-         // convert model to json
+         // 模型转json
          NSString *json = [book yy_modelToJSONString];
          // {"author":{"name":"J.K.Rowling","birthday":"1965-07-31T00:00:00+0000"},"name":"Harry Potter","pages":256}
      }
