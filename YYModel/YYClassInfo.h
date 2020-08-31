@@ -15,7 +15,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- Type encoding's type.
+ 类型：编码的类型
  */
 typedef NS_OPTIONS(NSUInteger, YYEncodingType) {
     YYEncodingTypeMask       = 0xFF, ///< mask of type value
@@ -64,20 +64,20 @@ typedef NS_OPTIONS(NSUInteger, YYEncodingType) {
 };
 
 /**
- Get the type from a Type-Encoding string.
+ 从编码字符串(Type-Encoding String)中获取编码类型
  
- @discussion See also:
+ @说明： 另请参阅:
  https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html
  https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtPropertyIntrospection.html
  
- @param typeEncoding  A Type-Encoding string.
- @return The encoding type.
+ @参数： typeEncoding  编码字符串
+ @返回： 编码类型
  */
 YYEncodingType YYEncodingGetType(const char *typeEncoding);
 
 
 /**
- Instance variable information.
+ 实例变量信息
  */
 @interface YYClassIvarInfo : NSObject
 @property (nonatomic, assign, readonly) Ivar ivar;              ///< ivar opaque struct
@@ -87,17 +87,17 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 @property (nonatomic, assign, readonly) YYEncodingType type;    ///< Ivar's type
 
 /**
- Creates and returns an ivar info object.
+ 创建和返回 包含ivar信息的对象
  
- @param ivar ivar opaque struct
- @return A new object, or nil if an error occurs.
+ @参数： ivar ivar内部结构体
+ @返回： 实例对象, 出错则返回nil
  */
 - (instancetype)initWithIvar:(Ivar)ivar;
 @end
 
 
 /**
- Method information.
+ 方法信息
  */
 @interface YYClassMethodInfo : NSObject
 @property (nonatomic, assign, readonly) Method method;                  ///< method opaque struct
@@ -109,17 +109,17 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 @property (nullable, nonatomic, strong, readonly) NSArray<NSString *> *argumentTypeEncodings; ///< array of arguments' type
 
 /**
- Creates and returns a method info object.
- 
- @param method method opaque struct
- @return A new object, or nil if an error occurs.
+ 创建和返回 包含方法信息的对象
+
+ @参数： method 方法的内部结构体
+ @返回： 实例对象, 出错则返回nil
  */
 - (instancetype)initWithMethod:(Method)method;
 @end
 
 
 /**
- Property information.
+ 属性信息
  */
 @interface YYClassPropertyInfo : NSObject
 @property (nonatomic, assign, readonly) objc_property_t property; ///< property's opaque struct
@@ -133,17 +133,17 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 @property (nonatomic, assign, readonly) SEL setter;               ///< setter (nonnull)
 
 /**
- Creates and returns a property info object.
- 
- @param property property opaque struct
- @return A new object, or nil if an error occurs.
+ 创建和返回 包含属性信息的对象
+
+ @参数： property 属性的内部结构体
+ @返回： 实例对象, 出错则返回nil
  */
 - (instancetype)initWithProperty:(objc_property_t)property;
 @end
 
 
 /**
- Class information for a class.
+ 类的类信息
  */
 @interface YYClassInfo : NSObject
 @property (nonatomic, assign, readonly) Class cls; ///< class object
@@ -157,41 +157,40 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 @property (nullable, nonatomic, strong, readonly) NSDictionary<NSString *, YYClassPropertyInfo *> *propertyInfos; ///< properties
 
 /**
- If the class is changed (for example: you add a method to this class with
- 'class_addMethod()'), you should call this method to refresh the class info cache.
+ 如果这个类发生了改变 (举个例子: 你通过调用'class_addMethod()'给这个类添加了新的方法), 你就需要调用这个方法来刷新这个类的信息缓存
  
- After called this method, `needUpdate` will returns `YES`, and you should call 
- 'classInfoWithClass' or 'classInfoWithClassName' to get the updated class info.
+ 调用此方法后, `needUpdate` 会返回 `YES`，然后你需要调用
+ 'classInfoWithClass' or 'classInfoWithClassName' 来获取更新后的类的信息
  */
 - (void)setNeedUpdate;
 
 /**
- If this method returns `YES`, you should stop using this instance and call
- `classInfoWithClass` or `classInfoWithClassName` to get the updated class info.
+ 如果此方法 返回 `YES`你需要调用
+ 'classInfoWithClass' or 'classInfoWithClassName' 来获取更新后的类的信息
  
- @return Whether this class info need update.
+ @返回： 是否需要更新这个类的相关信息
  */
 - (BOOL)needUpdate;
 
 /**
- Get the class info of a specified Class.
+ 获取指定类的类信息
  
- @discussion This method will cache the class info and super-class info
- at the first access to the Class. This method is thread-safe.
+ @说明： 此方法将在第一次使用特定类时，缓存类信息和父类信息
+ 这个方法是线程安全的
  
- @param cls A class.
- @return A class info, or nil if an error occurs.
+ @参数： cls 类
+ @返回： 类的信息, 出错时返回nil
  */
 + (nullable instancetype)classInfoWithClass:(Class)cls;
 
 /**
- Get the class info of a specified Class.
- 
- @discussion This method will cache the class info and super-class info
- at the first access to the Class. This method is thread-safe.
- 
- @param className A class name.
- @return A class info, or nil if an error occurs.
+ 获取指定类的类信息
+
+ @说明： 此方法将在第一次使用特定类时，缓存类信息和父类信息
+ 这个方法是线程安全的
+
+ @参数： className 类名
+ @返回： 类的信息, 出错时返回nil
  */
 + (nullable instancetype)classInfoWithClassName:(NSString *)className;
 
