@@ -317,7 +317,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
 
 
 
-/// 模型对象的属性信息
+/// 模型对象的属性元信息
 @interface _YYModelPropertyMeta : NSObject {
     @package
     NSString *_name;             ///< property's name
@@ -451,11 +451,11 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
 @end
 
 
-/// 模型对象的类信息
+/// 模型对象的类元信息
 @interface _YYModelMeta : NSObject {
     @package
     YYClassInfo *_classInfo;
-    /// Key:mapped key and key path, Value:_YYModelPropertyMeta.
+    /// Key:mapped key and key path, Value:_YYModelPropertyMeta.  例：{"pic": [_YYModelPropertyMeta new]}
     NSDictionary *_mapper;
     /// Array<_YYModelPropertyMeta>, 所有属性元的数组
     NSArray *_allPropertyMetas;
@@ -463,7 +463,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     NSArray *_keyPathPropertyMetas;
     /// Array<_YYModelPropertyMeta>, 映射到多个键的属性元.
     NSArray *_multiKeysPropertyMetas;
-    /// 有效的键值对数量，所谓有效及包含getter。 值与 _mapper.count 相同
+    /// 有效的键值对数量，所谓有效即包含 _getter、_setter、成员变量。 值与 _mapper.count 相同
     NSUInteger _keyMappedCount;
     /// 数据类型
     YYEncodingNSType _nsType;
@@ -1190,6 +1190,8 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
     if (!model || model == (id)kCFNull) return model;
     if ([model isKindOfClass:[NSString class]]) return model;
     if ([model isKindOfClass:[NSNumber class]]) return model;
+    
+    // 字典
     if ([model isKindOfClass:[NSDictionary class]]) {
         if ([NSJSONSerialization isValidJSONObject:model]) return model;
         NSMutableDictionary *newDic = [NSMutableDictionary new];
@@ -1202,6 +1204,8 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
         }];
         return newDic;
     }
+    
+    // 集合
     if ([model isKindOfClass:[NSSet class]]) {
         NSArray *array = ((NSSet *)model).allObjects;
         if ([NSJSONSerialization isValidJSONObject:array]) return array;
@@ -1216,6 +1220,8 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
         }
         return newArray;
     }
+    
+    // 数组
     if ([model isKindOfClass:[NSArray class]]) {
         if ([NSJSONSerialization isValidJSONObject:model]) return model;
         NSMutableArray *newArray = [NSMutableArray new];
@@ -1229,12 +1235,13 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
         }
         return newArray;
     }
+    
     if ([model isKindOfClass:[NSURL class]]) return ((NSURL *)model).absoluteString;
     if ([model isKindOfClass:[NSAttributedString class]]) return ((NSAttributedString *)model).string;
     if ([model isKindOfClass:[NSDate class]]) return [YYISODateFormatter() stringFromDate:(id)model];
     if ([model isKindOfClass:[NSData class]]) return nil;
     
-    
+    // 自定义类
     _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:[model class]];
     if (!modelMeta || modelMeta->_keyMappedCount == 0) return nil;
     NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithCapacity:64];
@@ -1301,6 +1308,7 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
     }];
     
     if (modelMeta->_hasCustomTransformToDictionary) {
+        // 校验数据
         BOOL suc = [((id<YYModel>)model) modelCustomTransformToDictionary:dic];
         if (!suc) return nil;
     }
@@ -1594,10 +1602,10 @@ static NSString *ModelDescription(NSObject *model) {
 - (id)yy_modelToJSONObject {
     /*
      Apple said:
-     The top level object is an NSArray or NSDictionary.
-     All objects are instances of NSString, NSNumber, NSArray, NSDictionary, or NSNull.
-     All dictionary keys are instances of NSString.
-     Numbers are not NaN or infinity.
+     顶层对象是NSArray或NSDictionary。
+     所有对象都是NSString、NSNumber、NSArray、NSDictionary或NSNull的实例。
+     所有字典键都是NSString的实例。
+     数字不是NaN或无穷大。
      */
     id jsonObject = ModelToJSONObjectRecursive(self);
     if ([jsonObject isKindOfClass:[NSArray class]]) return jsonObject;
