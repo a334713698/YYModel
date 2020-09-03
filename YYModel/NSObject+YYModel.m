@@ -457,7 +457,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     YYClassInfo *_classInfo;
     /// Key:mapped key and key path, Value:_YYModelPropertyMeta.  例：{"pic": [_YYModelPropertyMeta new]}
     NSDictionary *_mapper;
-    /// Array<_YYModelPropertyMeta>, 所有属性元的数组
+    /// Array<_YYModelPropertyMeta>, 所有有效属性元的数组
     NSArray *_allPropertyMetas;
     /// Array<_YYModelPropertyMeta>, 映射到键值路径的属性元.
     NSArray *_keyPathPropertyMetas;
@@ -1524,7 +1524,7 @@ static NSString *ModelDescription(NSObject *model) {
     // 创建和获取 模型的元类（包含类的详细信息）
     _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:object_getClass(self)];
     
-    // 判断当前类的属性数量
+    // 判断当前类的有效属性数量
     if (modelMeta->_keyMappedCount == 0) return NO;
     
     // 判断使用者是否自定义了转换映射
@@ -1572,7 +1572,7 @@ static NSString *ModelDescription(NSObject *model) {
     } else {
         /**
          @function CFArrayApplyFunction
-         对数组中的每个值调用函数一次。
+         对数组中的每个元素调用函数一次。
 
          @param theArray
          要操作的数组。
@@ -1602,10 +1602,10 @@ static NSString *ModelDescription(NSObject *model) {
 - (id)yy_modelToJSONObject {
     /*
      Apple said:
-     顶层对象是NSArray或NSDictionary。
-     所有对象都是NSString、NSNumber、NSArray、NSDictionary或NSNull的实例。
-     所有字典键都是NSString的实例。
-     数字不是NaN或无穷大。
+     The top level object is an NSArray or NSDictionary.
+     All objects are instances of NSString, NSNumber, NSArray, NSDictionary, or NSNull.
+     All dictionary keys are instances of NSString.
+     Numbers are not NaN or infinity.
      */
     id jsonObject = ModelToJSONObjectRecursive(self);
     if ([jsonObject isKindOfClass:[NSArray class]]) return jsonObject;
